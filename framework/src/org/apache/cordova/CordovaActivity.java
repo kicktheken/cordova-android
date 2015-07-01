@@ -112,7 +112,7 @@ public class CordovaActivity extends Activity {
         {
             getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         }
-        
+
         if(preferences.getBoolean("SetFullscreen", false))
         {
             Log.d(TAG, "The SetFullscreen configuration is deprecated in favor of Fullscreen, and will be removed in a future version.");
@@ -164,7 +164,6 @@ public class CordovaActivity extends Activity {
         parser.parse(this);
         preferences = parser.getPreferences();
         preferences.setPreferencesBundle(getIntent().getExtras());
-        preferences.copyIntoIntentExtras(this);
         launchUrl = parser.getLaunchUrl();
         pluginEntries = parser.getPluginEntries();
         Config.parser = parser;

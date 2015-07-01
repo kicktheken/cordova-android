@@ -305,9 +305,11 @@ var builders = {
                 var sdkDir = process.env['ANDROID_HOME'];
                 var wrapperDir = path.join(sdkDir, 'tools', 'templates', 'gradle', 'wrapper');
                 if (process.platform == 'win32') {
-                    shell.cp('-f', path.join(wrapperDir, 'gradlew.bat'), projectPath);
+                    shell.rm('-f', path.join(projectPath, 'gradlew.bat'));
+                    shell.cp(path.join(wrapperDir, 'gradlew.bat'), projectPath);
                 } else {
-                    shell.cp('-f', path.join(wrapperDir, 'gradlew'), projectPath);
+                    shell.rm('-f', path.join(projectPath, 'gradlew'));
+                    shell.cp(path.join(wrapperDir, 'gradlew'), projectPath);
                 }
                 shell.rm('-rf', path.join(projectPath, 'gradle', 'wrapper'));
                 shell.mkdir('-p', path.join(projectPath, 'gradle'));
@@ -319,6 +321,7 @@ var builders = {
                 var distributionUrlRegex = /distributionUrl.*zip/;
                 var distributionUrl = 'distributionUrl=http\\://services.gradle.org/distributions/gradle-2.2.1-all.zip';
                 var gradleWrapperPropertiesPath = path.join(projectPath, 'gradle', 'wrapper', 'gradle-wrapper.properties');
+                shell.chmod('u+w', gradleWrapperPropertiesPath);
                 shell.sed('-i', distributionUrlRegex, distributionUrl, gradleWrapperPropertiesPath);
 
                 var propertiesFile = opts.buildType + SIGNING_PROPERTIES;
@@ -467,11 +470,10 @@ function parseOpts(options, resolvedTarget) {
     // If some values are not specified as command line arguments - use build config to supplement them.
     // Command line arguemnts have precedence over build config.
     if (buildConfig) {
-        console.log(path.resolve(buildConfig));
         if (!fs.existsSync(buildConfig)) {
             throw new Error('Specified build config file does not exist: ' + buildConfig);
         }
-        console.log('Reading build config file: '+ buildConfig);
+        console.log('Reading build config file: '+ path.resolve(buildConfig));
         var config = JSON.parse(fs.readFileSync(buildConfig, 'utf8'));
         if (config.android && config.android[ret.buildType]) {
             var androidInfo = config.android[ret.buildType];
